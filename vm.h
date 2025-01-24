@@ -61,6 +61,7 @@ typedef struct
 
 void execute_command(vm_t* vm, command_t* cmd);
 vm_t* create_vm();
+void free_vm(vm_t* vm);
 void load_program(vm_t* vm);
 reg_t add(reg_t left, reg_t right);
 reg_t subtract(reg_t left, reg_t right);

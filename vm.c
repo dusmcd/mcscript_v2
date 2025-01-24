@@ -27,6 +27,14 @@ vm_t* create_vm()
   return vm; 
 }
 
+void free_vm(vm_t* vm)
+{
+  free(vm->cpu);
+  free(vm);
+
+  vm = NULL;
+}
+
 void execute_command(vm_t* vm, command_t* cmd)
 {
   operation_t op = vm->cpu->instruction_set[cmd->instr_idx].operation;
