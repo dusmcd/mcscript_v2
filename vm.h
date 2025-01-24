@@ -1,7 +1,9 @@
 #ifndef _VM_H
 #define _VM_H
+#define MAX 0Xffff
 
 #include <stdint.h>
+#include "object.h"
 
 typedef uint16_t reg_t; // 16 bit machine
 typedef unsigned char byte;
@@ -42,13 +44,13 @@ typedef struct
 typedef struct
 {
   byte instr_idx;
-  void** operands;
+  object_t** operands;
 } command_t;
 
 typedef struct // for simplicity's sake, we will only run one program at a time
 {
   reg_t program_counter;
-  command_t* address_space[0xffff]; // can address up to 2^16 memory addresses; will hold commands for program to execute
+  command_t** address_space; // can address up to 2^16 memory addresses; will hold commands for program to execute
   reg_t stack_ptr; // the index for the current frame
   stack_t* frames; // all the call stack frames in a program
 } program_t;
@@ -57,17 +59,18 @@ typedef struct
 {
   cpu_t* cpu;
   program_t* current_program;
+  reg_t limit; // equals MAX
 } vm_t;
 
-void execute_command(vm_t* vm, command_t* cmd);
+object_t* execute_command(vm_t* vm, command_t* cmd);
 vm_t* create_vm();
 void free_vm(vm_t* vm);
 void load_program(vm_t* vm);
-reg_t add(reg_t left, reg_t right);
-reg_t subtract(reg_t left, reg_t right);
-reg_t multiply(reg_t left, reg_t right);
-reg_t divide(reg_t left, reg_t right);
-reg_t allocate();
-void assign(reg_t memory_addr, void* val);
+object_t* add(object_t* left, object_t* right);
+object_t* subtract(object_t* left, object_t* right);
+object_t* multiply(object_t* left, object_t* right);
+object_t* divide(object_t* left, object_t* right);
+reg_t allocate(vm_t vm);
+void assign(object_t* memory_addr, void* val);
 
 #endif
