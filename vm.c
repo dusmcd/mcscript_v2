@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-vm_t* create_vm()
-{
+vm_t* create_vm() {
   vm_t* vm = malloc(sizeof(vm_t));
   if (vm == NULL)
     return NULL;
@@ -29,8 +28,7 @@ vm_t* create_vm()
   return vm; 
 }
 
-void free_vm(vm_t* vm)
-{
+void free_vm(vm_t* vm) {
   if (vm->cpu != NULL)
     free(vm->cpu);
   
@@ -40,8 +38,7 @@ void free_vm(vm_t* vm)
   vm = NULL;
 }
 
-object_t* execute_command(vm_t* vm, command_t* cmd)
-{
+object_t* execute_command(vm_t* vm, command_t* cmd) {
   instruction_t instr = vm->cpu->instruction_set[cmd->instr_idx];
   operation_t op = instr.operation;
   switch(op)
@@ -73,8 +70,7 @@ object_t* execute_command(vm_t* vm, command_t* cmd)
   }
 }
 
-object_t* add(object_t* left, object_t* right)
-{
+object_t* add(object_t* left, object_t* right) {
   if (left == NULL || right == NULL)
     return NULL;
 
@@ -112,8 +108,7 @@ object_t* add(object_t* left, object_t* right)
   }
 }
 
-object_t* subtract(object_t* left, object_t* right)
-{
+object_t* subtract(object_t* left, object_t* right) {
   if (left == NULL || right == NULL)
     return NULL;
 
@@ -134,8 +129,7 @@ object_t* subtract(object_t* left, object_t* right)
       return NULL;
   }
 }
-object_t* multiply(object_t* left, object_t* right)
-{
+object_t* multiply(object_t* left, object_t* right) {
   if (left == NULL || right == NULL)
     return NULL;
   
@@ -155,8 +149,7 @@ object_t* multiply(object_t* left, object_t* right)
       return NULL;
   }
 }
-object_t* divide(object_t* left, object_t* right)
-{
+object_t* divide(object_t* left, object_t* right) {
   if (left == NULL || right == NULL)
     return NULL;
   

@@ -1,15 +1,12 @@
 #ifndef _VM_H
 #define _VM_H
-#define MAX 0Xffff
+#define MAX 0xffff
 
-#include <stdint.h>
 #include "object.h"
+#include "stack.h"
+#include "types.h"
 
-typedef uint16_t reg_t; // 16 bit machine
-typedef unsigned char byte;
-
-typedef enum
-{
+typedef enum {
   ADD,
   SUBTRACT,
   MULTIPLY,
@@ -18,14 +15,12 @@ typedef enum
   ASSIGN
 } operation_t;
 
-typedef struct
-{
+typedef struct {
   operation_t operation;
   int num_operands;
 } instruction_t;
 
-typedef struct
-{
+typedef struct {
   instruction_t instruction_set[6];
   reg_t rega;
   reg_t regb;
@@ -33,30 +28,20 @@ typedef struct
   reg_t regd;
 } cpu_t;
 
-typedef struct
-{
-  reg_t capacity;
-  reg_t count;
-  void** data;
-  reg_t base_pointer; // this will serve as an unchanging reference that can be offset to retrieve data
-} stack_t;
 
-typedef struct
-{
+typedef struct {
   byte instr_idx;
   object_t** operands;
 } command_t;
 
-typedef struct // for simplicity's sake, we will only run one program at a time
-{
+typedef struct {// for simplicity's sake, we will only run one program at a time
   reg_t program_counter;
-  command_t** address_space; // can address up to 2^16 memory addresses; will hold commands for program to execute
+  void** address_space; // can address up to 2^16 memory addresses;
   reg_t stack_ptr; // the index for the current frame
   stack_t* frames; // all the call stack frames in a program
 } program_t;
 
-typedef struct
-{
+typedef struct {
   cpu_t* cpu;
   program_t* current_program;
   reg_t limit; // equals MAX

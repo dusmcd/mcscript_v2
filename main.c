@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include "vm.h"
 
-int main()
-{
+int main() {
   vm_t* vm = create_vm();
   printf("Vitrual Machine created...\n");
   object_t* left = malloc(sizeof(object_t));
@@ -29,6 +28,5 @@ int main()
   printf("The resulting sum of %i + %i = %i\n", left->data.v_int, right->data.v_int, sum->data.v_int);
   free_vm(vm);
   free(cmd);
-  cmd = NULL;
   return 0;
 }
