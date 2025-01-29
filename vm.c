@@ -1,6 +1,7 @@
 #include "vm.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 vm_t* create_vm() {
   vm_t* vm = malloc(sizeof(vm_t));
@@ -38,27 +39,39 @@ void free_vm(vm_t* vm) {
   vm = NULL;
 }
 
+
 object_t* execute_command(vm_t* vm, command_t* cmd) {
   instruction_t instr = vm->cpu->instruction_set[cmd->instr_idx];
   operation_t op = instr.operation;
-  switch(op)
-  {
-    case ADD:
-      // call add function
-      return add(cmd->operands[0], cmd->operands[1]);
+  switch(op) {
+    case ADD: {
+      object_t* left = get_obj_from_memory(vm, cmd->operands[0]);
+      object_t* right = get_obj_from_memory(vm, cmd->operands[1]);
+
+      return add(left, right);
       break;
-    case SUBTRACT:
-      // call subtract function
-      return subtract(cmd->operands[0], cmd->operands[1]);
+    }
+    case SUBTRACT: {
+      object_t* left = get_obj_from_memory(vm, cmd->operands[0]);
+      object_t* right = get_obj_from_memory(vm, cmd->operands[1]);
+
+      return subtract(left, right);
       break;
-    case MULTIPLY:
-      // call multiply function
-      return multiply(cmd->operands[0], cmd->operands[1]);
+    }
+    case MULTIPLY: {
+      object_t* left = get_obj_from_memory(vm, cmd->operands[0]);
+      object_t* right = get_obj_from_memory(vm, cmd->operands[1]);
+      
+      return multiply(left, right);
       break;
-    case DIVIDE:
-      // call divide function
-      return divide(cmd->operands[0], cmd->operands[1]);
+    }
+    case DIVIDE: {
+      object_t* left = get_obj_from_memory(vm, cmd->operands[0]);
+      object_t* right = get_obj_from_memory(vm, cmd->operands[1]);
+      
+      return divide(left, right);
       break;
+    }
     case ALLOCATE:
       // make space for a command and identify it
       break;
@@ -68,41 +81,30 @@ object_t* execute_command(vm_t* vm, command_t* cmd) {
     default:
       return NULL;
   }
+  return NULL;
 }
 
 object_t* add(object_t* left, object_t* right) {
   if (left == NULL || right == NULL)
     return NULL;
 
-  switch(left->type)
-  {
+  switch(left->type) {
     case INTEGER:
-      if (right->type == INTEGER)
-      {
+      if (right->type == INTEGER) {
         int sum = left->data.v_int + right->data.v_int;
-        object_t* obj = malloc(sizeof(obj));
-        obj->data.v_int = sum;
-        obj->type = INTEGER;
+        object_t* obj = create_new_int(sum);
         return obj;
       }
       else
         return NULL;
     case STRING:
-      if (right->type == STRING)
-      {
+      if (right->type == STRING) {
         char* cat = strcat(left->data.v_string, right->data.v_string);
-        int length = strlen(left->data.v_string) + strlen(right->data.v_string);
-        char* new_str = malloc(length + 1);
-        strcpy(new_str, cat);
-
-        object_t* obj = malloc(sizeof(obj));
-        obj->data.v_string = new_str;
-        obj->type = STRING;
+        object_t* obj = create_new_string(cat);
         return obj;
       }
       return NULL;
-    default:
-    {
+    default: {
       return NULL;
     }
   }
@@ -112,15 +114,11 @@ object_t* subtract(object_t* left, object_t* right) {
   if (left == NULL || right == NULL)
     return NULL;
 
-  switch(left->type)
-  {
+  switch(left->type) {
     case INTEGER:
-      if (right->type == INTEGER)
-      {
+      if (right->type == INTEGER) {
         int diff = left->data.v_int - right->data.v_int;
-        object_t* obj = malloc(sizeof(object_t));
-        obj->data.v_int = diff;
-        obj->type = INTEGER;
+        object_t* obj = create_new_int(diff);
 
         return obj;
       }
@@ -133,15 +131,11 @@ object_t* multiply(object_t* left, object_t* right) {
   if (left == NULL || right == NULL)
     return NULL;
   
-  switch (left->type)
-  {
+  switch (left->type) {
     case INTEGER:
-      if (right->type == INTEGER)
-      {
+      if (right->type == INTEGER) {
         int product = left->data.v_int * right->data.v_int;
-        object_t* obj = malloc(sizeof(object_t));
-        obj->data.v_int = product;
-        obj->type = INTEGER;
+        object_t* obj = create_new_int(product);
         return obj;
       }
       return NULL;
@@ -153,19 +147,26 @@ object_t* divide(object_t* left, object_t* right) {
   if (left == NULL || right == NULL)
     return NULL;
   
-  switch(left->type)
-  {
+  switch(left->type) {
     case INTEGER:
-      if (right->type == INTEGER)
-      {
+      if (right->type == INTEGER) {
         int quot = left->data.v_int / right->data.v_int;
-        object_t* obj = malloc(sizeof(object_t));
-        obj->data.v_int = quot;
-        obj->type = INTEGER;
+        object_t* obj = create_new_int(quot);
         return obj;
       }
       return NULL;
     default:
       return NULL;
   }
+}
+
+object_t* get_obj_from_memory(vm_t* vm, int reg_idx) {
+  cpu_t* cpu = vm->cpu;
+  reg_t memory_addr = cpu->registers[reg_idx];
+
+  object_t* obj = vm->current_program->address_space[memory_addr];
+  if (obj == NULL)
+    return NULL;
+  
+  return obj;
 }

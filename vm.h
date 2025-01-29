@@ -12,7 +12,8 @@ typedef enum {
   MULTIPLY,
   DIVIDE,
   ALLOCATE,
-  ASSIGN
+  ASSIGN,
+  OUTPUT
 } operation_t;
 
 typedef struct {
@@ -22,16 +23,13 @@ typedef struct {
 
 typedef struct {
   instruction_t instruction_set[6];
-  reg_t rega;
-  reg_t regb;
-  reg_t regc;
-  reg_t regd;
+  reg_t registers[4]; // each reg will point to an address, which is an index to address_space
 } cpu_t;
 
 
 typedef struct {
   byte instr_idx;
-  object_t** operands;
+  byte operands[2]; // 0-3 indicating which register to look at for value
 } command_t;
 
 typedef struct {// for simplicity's sake, we will only run one program at a time
@@ -55,6 +53,7 @@ object_t* add(object_t* left, object_t* right);
 object_t* subtract(object_t* left, object_t* right);
 object_t* multiply(object_t* left, object_t* right);
 object_t* divide(object_t* left, object_t* right);
+object_t* get_obj_from_memory(vm_t* vm, int reg_idx);
 reg_t allocate(vm_t vm);
 void assign(object_t* memory_addr, void* val);
 

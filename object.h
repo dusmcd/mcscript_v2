@@ -16,6 +16,9 @@ typedef struct {
   data_t data;
 } object_t;
 
+object_t* create_new_int(int val);
+object_t* create_new_string(const char* str);
+
 
 
 #endif
