@@ -24,7 +24,7 @@ vm_t* create_vm() {
     cpu->instruction_set[i] = instruction_set[i];
 
   vm->cpu = cpu;
-  vm->limit = MAX;
+  vm->limit = MAX - 1;
 
   return vm; 
 }
@@ -39,35 +39,50 @@ void free_vm(vm_t* vm) {
   vm = NULL;
 }
 
+void free_program(program_t* program) {
+  if (program->address_space != NULL) {
+    for (reg_t i = 0; i <= program->current_addr_obj; i++) {
+      if (program->address_space[i] == 0)
+        continue;
+      free(program->address_space[i]);
+    }
+    free(program->address_space);
+    program->address_space = NULL;
+  }
+  free(program);
+  program = NULL;
+}
+
 
 object_t* execute_command(vm_t* vm, command_t* cmd) {
   instruction_t instr = vm->cpu->instruction_set[cmd->instr_idx];
   operation_t op = instr.operation;
+  void** address_space = vm->current_program->address_space;
   switch(op) {
     case ADD: {
-      object_t* left = get_obj_from_memory(vm, cmd->operands[0]);
-      object_t* right = get_obj_from_memory(vm, cmd->operands[1]);
+      object_t* left = get_obj_from_memory(address_space, cmd->operands[0]);
+      object_t* right = get_obj_from_memory(address_space, cmd->operands[1]);
 
       return add(left, right);
       break;
     }
     case SUBTRACT: {
-      object_t* left = get_obj_from_memory(vm, cmd->operands[0]);
-      object_t* right = get_obj_from_memory(vm, cmd->operands[1]);
+      object_t* left = get_obj_from_memory(address_space, cmd->operands[0]);
+      object_t* right = get_obj_from_memory(address_space, cmd->operands[1]);
 
       return subtract(left, right);
       break;
     }
     case MULTIPLY: {
-      object_t* left = get_obj_from_memory(vm, cmd->operands[0]);
-      object_t* right = get_obj_from_memory(vm, cmd->operands[1]);
+      object_t* left = get_obj_from_memory(address_space, cmd->operands[0]);
+      object_t* right = get_obj_from_memory(address_space, cmd->operands[1]);
       
       return multiply(left, right);
       break;
     }
     case DIVIDE: {
-      object_t* left = get_obj_from_memory(vm, cmd->operands[0]);
-      object_t* right = get_obj_from_memory(vm, cmd->operands[1]);
+      object_t* left = get_obj_from_memory(address_space, cmd->operands[0]);
+      object_t* right = get_obj_from_memory(address_space, cmd->operands[1]);
       
       return divide(left, right);
       break;
@@ -160,13 +175,97 @@ object_t* divide(object_t* left, object_t* right) {
   }
 }
 
-object_t* get_obj_from_memory(vm_t* vm, int reg_idx) {
-  cpu_t* cpu = vm->cpu;
-  reg_t memory_addr = cpu->registers[reg_idx];
-
-  object_t* obj = vm->current_program->address_space[memory_addr];
-  if (obj == NULL)
+object_t* get_obj_from_memory(void** address_space, reg_t memory_addr) {
+  if (address_space == NULL)
     return NULL;
   
+  if (memory_addr > MAX)
+    return NULL;
+  
+  object_t* obj = (object_t*)address_space[memory_addr];
+
   return obj;
+}
+
+int get_instr_idx(operation_t op) {
+  switch(op) {
+    case ADD:
+      return 0;
+    case SUBTRACT:
+      return 1;
+    case MULTIPLY:
+      return 2;
+    case DIVIDE:
+      return 3;
+    default:
+      return -1;
+  }
+  return -1;
+}
+
+command_t* create_command(operation_t op, reg_t* addresses, int num_ops) {
+  command_t* cmd = malloc(sizeof(command_t));
+  if (cmd == NULL)
+    return NULL;
+  
+  cmd->instr_idx = get_instr_idx(op);
+  for (int i = 0; i < num_ops; i++) {
+    cmd->operands[i] = addresses[i];
+  }
+
+  return cmd;
+}
+
+program_t* create_program(vm_t* vm) {
+  program_t* program = malloc(sizeof(program_t));
+  if (program == NULL)
+    return NULL;
+  
+  void** memory = malloc(sizeof(void*) * MAX);
+  if (memory == NULL) {
+    return NULL;
+  }
+
+  program->address_space = memory;
+  program->cmd_start = 0x0;
+  program->cmd_end = 0x8000 - 1;
+  program->obj_start = 0x8000;
+  program->obj_end = vm->limit;
+
+  program->current_addr_cmd = program->cmd_start;
+  program->current_addr_obj = program->obj_start;
+  
+  return program;
+}
+
+
+void write_obj_memory(program_t* program, object_t* obj) {
+  if (program == NULL || obj == NULL)
+    return;
+  
+  reg_t next_address = program->current_addr_obj;
+  if (next_address >= program->obj_end)
+    exit(1);
+
+  obj->address = next_address;
+  program->address_space[next_address] = obj;
+
+  program->current_addr_obj++;
+}
+
+void write_cmd_memory(program_t* program, command_t* cmd) {
+  if (program == NULL || cmd == NULL)
+    return;
+  
+  reg_t next_address = program->current_addr_cmd;
+  if (next_address >= program->cmd_end)
+    exit(1);
+
+  program->address_space[next_address] = cmd;
+
+  program->current_addr_cmd++;
+}
+
+void load_program(vm_t* vm, program_t* program) {
+  vm->current_program = program;
 }

@@ -29,7 +29,7 @@ typedef struct {
 
 typedef struct {
   byte instr_idx;
-  byte operands[2]; // 0-3 indicating which register to look at for value
+  reg_t operands[2]; // address of object in address_space
 } command_t;
 
 typedef struct {// for simplicity's sake, we will only run one program at a time
@@ -37,6 +37,12 @@ typedef struct {// for simplicity's sake, we will only run one program at a time
   void** address_space; // can address up to 2^16 memory addresses;
   reg_t stack_ptr; // the index for the current frame
   stack_t* frames; // all the call stack frames in a program
+  reg_t cmd_start;
+  reg_t cmd_end;
+  reg_t obj_start;
+  reg_t obj_end;
+  reg_t current_addr_cmd;
+  reg_t current_addr_obj;
 } program_t;
 
 typedef struct {
@@ -47,14 +53,19 @@ typedef struct {
 
 object_t* execute_command(vm_t* vm, command_t* cmd);
 vm_t* create_vm();
+command_t* create_command(operation_t op, reg_t* addresses, int num_ops);
+program_t* create_program(vm_t* vm);
 void free_vm(vm_t* vm);
-void load_program(vm_t* vm);
+void free_program(program_t* program);
+void write_obj_memory(program_t* program, object_t* obj);
+void write_cmd_memory(program_t* program, command_t* cmd);
+void load_program(vm_t* vm, program_t* program);
 object_t* add(object_t* left, object_t* right);
 object_t* subtract(object_t* left, object_t* right);
 object_t* multiply(object_t* left, object_t* right);
 object_t* divide(object_t* left, object_t* right);
-object_t* get_obj_from_memory(vm_t* vm, int reg_idx);
-reg_t allocate(vm_t vm);
+object_t* get_obj_from_memory(void** address_space, reg_t memory_addr);
+reg_t allocate(vm_t* vm);
 void assign(object_t* memory_addr, void* val);
 
 #endif

@@ -2,14 +2,16 @@
 #define _TEST_VM_H
 
 #include "../vm.h"
+#include "../object.h"
 #include <stdbool.h>
 
 
 typedef struct {
   vm_t* vm;
-  command_t cmd;
+  command_t* cmd;
   object_t output;
   const char* desc;
+  type_t type;
 } test_case_exec;
 
 
