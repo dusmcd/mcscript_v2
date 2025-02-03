@@ -240,12 +240,12 @@ program_t* create_program(vm_t* vm) {
 }
 
 
-void write_obj_memory(program_t* program, object_t* obj) {
+void write_obj_memory(program_t* program, object_t* obj, reg_t address) {
   if (program == NULL || obj == NULL)
     return;
   
-  reg_t next_address = program->current_addr_obj;
-  if (next_address >= program->obj_end)
+  reg_t next_address = address == 0 ? program->current_addr_obj : address;
+  if (next_address >= program->obj_end || next_address < program->obj_start)
     exit(1);
 
   obj->address = next_address;
@@ -278,18 +278,12 @@ object_t* create_new_object(data_t val, type_t type, program_t* program, reg_t a
   switch(type) {
     case INTEGER: {
       object_t* obj = create_new_int(val.v_int);
-      if (address == 0)
-        write_obj_memory(program, obj);
-      else
-        program->address_space[address] = obj;
+      write_obj_memory(program, obj, address);
       return obj;
     }
     case STRING: {
       object_t* obj = create_new_string(val.v_string);
-      if (address == 0)
-        write_obj_memory(program, obj);
-      else
-        program->address_space[address] = obj;
+      write_obj_memory(program, obj, address);
       return obj;
     }
     case NONE: {
@@ -299,7 +293,7 @@ object_t* create_new_object(data_t val, type_t type, program_t* program, reg_t a
         return NULL;
       }
       obj->type = NONE;
-      write_obj_memory(program, obj);
+      write_obj_memory(program, obj, address);
       return obj;
     }
     default: {

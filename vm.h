@@ -59,7 +59,7 @@ command_t* create_command(operation_t op, reg_t* addresses, int num_ops);
 program_t* create_program(vm_t* vm);
 void free_vm(vm_t* vm);
 void free_program(program_t* program);
-void write_obj_memory(program_t* program, object_t* obj);
+void write_obj_memory(program_t* program, object_t* obj, reg_t address);
 void write_cmd_memory(program_t* program, command_t* cmd);
 void load_program(vm_t* vm, program_t* program);
 object_t* add(object_t* left, object_t* right);
