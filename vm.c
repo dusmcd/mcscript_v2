@@ -17,8 +17,8 @@ vm_t* create_vm() {
     {.num_operands = 2, .operation = SUBTRACT},
     {.num_operands = 2, .operation = MULTIPLY},
     {.num_operands = 2, .operation = DIVIDE},
-    {.num_operands = 2, .operation = ASSIGN},
-    {.num_operands = 2, .operation = ALLOCATE},
+    {.num_operands = 2, .operation = NEW},
+    {.num_operands = 1, .operation = ASSIGN}
   };
   for (int i = 0; i < 6; i++)
     cpu->instruction_set[i] = instruction_set[i];
@@ -87,12 +87,13 @@ object_t* execute_command(vm_t* vm, command_t* cmd) {
       return divide(left, right);
       break;
     }
-    case ALLOCATE:
-      // make space for a command and identify it
-      break;
-    case ASSIGN:
-      // put a value in memory
-      break;
+    case NEW: {
+      return create_new_object(cmd->val, cmd->type, vm->current_program, 0);
+    }
+    case ASSIGN: {
+      // first operand is address of object being assigned to
+      return create_new_object(cmd->val, cmd->type, vm->current_program, cmd->operands[0]);
+    }
     default:
       return NULL;
   }
@@ -268,4 +269,43 @@ void write_cmd_memory(program_t* program, command_t* cmd) {
 
 void load_program(vm_t* vm, program_t* program) {
   vm->current_program = program;
+}
+
+object_t* create_new_object(data_t val, type_t type, program_t* program, reg_t address) {
+  if (program == NULL)
+    return NULL;
+  
+  switch(type) {
+    case INTEGER: {
+      object_t* obj = create_new_int(val.v_int);
+      if (address == 0)
+        write_obj_memory(program, obj);
+      else
+        program->address_space[address] = obj;
+      return obj;
+    }
+    case STRING: {
+      object_t* obj = create_new_string(val.v_string);
+      if (address == 0)
+        write_obj_memory(program, obj);
+      else
+        program->address_space[address] = obj;
+      return obj;
+    }
+    case NONE: {
+      // meaning we are simply creating an object in memory without data (e.g., var num;)
+      object_t* obj = malloc(sizeof(object_t));
+      if (obj == NULL) {
+        return NULL;
+      }
+      obj->type = NONE;
+      write_obj_memory(program, obj);
+      return obj;
+    }
+    default: {
+      return NULL;
+    }
+  }
+
+  return NULL;
 }

@@ -11,9 +11,9 @@ typedef enum {
   SUBTRACT,
   MULTIPLY,
   DIVIDE,
-  ALLOCATE,
-  ASSIGN,
-  OUTPUT
+  NEW,
+  OUTPUT,
+  ASSIGN
 } operation_t;
 
 typedef struct {
@@ -30,6 +30,8 @@ typedef struct {
 typedef struct {
   byte instr_idx;
   reg_t operands[2]; // address of object in address_space
+  data_t val;
+  type_t type;
 } command_t;
 
 typedef struct {// for simplicity's sake, we will only run one program at a time
@@ -65,7 +67,6 @@ object_t* subtract(object_t* left, object_t* right);
 object_t* multiply(object_t* left, object_t* right);
 object_t* divide(object_t* left, object_t* right);
 object_t* get_obj_from_memory(void** address_space, reg_t memory_addr);
-reg_t allocate(vm_t* vm);
-void assign(object_t* memory_addr, void* val);
+object_t* create_new_object(data_t val, type_t type, program_t* program, reg_t address);
 
 #endif

@@ -6,6 +6,7 @@
 typedef enum {
   INTEGER,
   STRING, 
+  NONE
 } type_t;
 
 typedef union {
