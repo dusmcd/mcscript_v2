@@ -9,7 +9,7 @@
 typedef struct {
   vm_t* vm;
   command_t* cmd;
-  object_t output;
+  object_t* output;
   const char* desc;
   type_t type;
 } test_case_exec;

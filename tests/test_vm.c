@@ -4,6 +4,14 @@
 
 #include "test_vm.h"
 
+void print_address_space(void** address_space) {
+  for (size_t i = 0; i < 6; i++) {
+    reg_t index = 0x8000 + i;
+    object_t* obj = (object_t*)address_space[index];
+    printf("address: %i, obj address: %i\n", index, obj->address);
+  }
+}
+
 bool test_arithmetic(test_case_exec* test_cases, int size) {
   for (int i = 0; i < size; i++) {
     test_case_exec t_case = test_cases[i];
@@ -14,15 +22,15 @@ bool test_arithmetic(test_case_exec* test_cases, int size) {
     switch(t_case.type)
     {
       case INTEGER:
-        printf("%i, ", t_case.output.data.v_int);
+        printf("%i, ", t_case.output->data.v_int);
         printf("Actual output: %i\n", actual->data.v_int);
-        if (t_case.output.data.v_int != actual->data.v_int)
+        if (t_case.output->data.v_int != actual->data.v_int)
           return false;
         break;
       case STRING:
-        printf("\"%s\", ", t_case.output.data.v_string);
+        printf("\"%s\", ", t_case.output->data.v_string);
         printf("Actual output: \"%s\"\n", actual->data.v_string);
-        if (strcmp(t_case.output.data.v_string, actual->data.v_string) != 0)
+        if (strcmp(t_case.output->data.v_string, actual->data.v_string) != 0)
           return false;
         break;
       default:
@@ -41,7 +49,7 @@ void test_vm() {
   int total = 1;
   int passed = 0;
 
-  if (test_arithmetic(test_cases, 3)) {
+  if (test_arithmetic(test_cases, 5)) {
     passed++;
     printf("arithmetic test passed\n");
   }
@@ -52,12 +60,15 @@ void test_vm() {
 
   free_program(vm->current_program);
   free_vm(vm);
+
+  for (int i = 0; i < 5; i++)
+    free(test_cases[i].output);
   free(test_cases);
   test_cases = NULL;
 }
 
 test_case_exec* generate_arith_cases(vm_t* vm) {
-  test_case_exec* test_cases = malloc(sizeof(test_case_exec) * 3);
+  test_case_exec* test_cases = malloc(sizeof(test_case_exec) * 5);
 
   object_t* obj1 = create_new_int(2);
   object_t* obj2 = create_new_int(3);
@@ -99,11 +110,11 @@ test_case_exec* generate_arith_cases(vm_t* vm) {
 
   load_program(vm, program);
 
-  test_cases[0] = (test_case_exec){.cmd = cmd1, .desc = "Testing add operation", .output = {.data.v_int = 5, .type = INTEGER}, .vm = vm, .type = INTEGER};
-  test_cases[1] = (test_case_exec){.cmd = cmd2, .desc = "Testing string concat", .output = {.data.v_string = "Hello, World", .type = STRING}, .vm = vm, .type = STRING};
-  test_cases[2] = (test_case_exec){.cmd = cmd3, .desc = "Testing subtract operation", .output = {.data.v_int = 70, .type = INTEGER}, .vm = vm, .type = INTEGER};
-  test_cases[3] = (test_case_exec){.cmd = cmd4, .desc = "Testing multiply operation", .output = {.data.v_int = 6, .type = INTEGER}, .vm = vm, .type = INTEGER};
-  test_cases[4] = (test_case_exec){.cmd = cmd5, .desc = "Testing divide operation", .output = {.data.v_int = 10, .type = INTEGER}, .vm = vm, .type = INTEGER};
+  test_cases[0] = (test_case_exec){.cmd = cmd1, .desc = "Testing add operation", .output = create_new_int(5), .vm = vm, .type = INTEGER};
+  test_cases[1] = (test_case_exec){.cmd = cmd2, .desc = "Testing string concat", .output = create_new_string("Hello, World"), .vm = vm, .type = STRING};
+  test_cases[2] = (test_case_exec){.cmd = cmd3, .desc = "Testing subtract operation", .output = create_new_int(70), .vm = vm, .type = INTEGER};
+  test_cases[3] = (test_case_exec){.cmd = cmd4, .desc = "Testing multiply operation", .output = create_new_int(6), .vm = vm, .type = INTEGER};
+  test_cases[4] = (test_case_exec){.cmd = cmd5, .desc = "Testing divide operation", .output = create_new_int(10), .vm = vm, .type = INTEGER};
   return test_cases;
 }
 
