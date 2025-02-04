@@ -4,7 +4,7 @@
 
 #include "test_vm.h"
 
-bool test_execute_command(test_case_exec* test_cases, int size) {
+bool test_arithmetic(test_case_exec* test_cases, int size) {
   for (int i = 0; i < size; i++) {
     test_case_exec t_case = test_cases[i];
     printf("%s\n", t_case.desc);
@@ -35,18 +35,18 @@ bool test_execute_command(test_case_exec* test_cases, int size) {
 }
 void test_vm() {
   vm_t* vm = create_vm();
-  test_case_exec* test_cases = generate_exec_cases(vm);
+  test_case_exec* test_cases = generate_arith_cases(vm);
 
   printf("Testing vm_t functionality...\n\n");
   int total = 1;
   int passed = 0;
 
-  if (test_execute_command(test_cases, 3)) {
+  if (test_arithmetic(test_cases, 3)) {
     passed++;
-    printf("'execute_command' test passed\n");
+    printf("arithmetic test passed\n");
   }
   else 
-    printf("'execute_command' test failed\n");
+    printf("arithmetic test failed\n");
   
   printf("\n%i of %i test passed\n", passed, total);
 
@@ -56,7 +56,7 @@ void test_vm() {
   test_cases = NULL;
 }
 
-test_case_exec* generate_exec_cases(vm_t* vm) {
+test_case_exec* generate_arith_cases(vm_t* vm) {
   test_case_exec* test_cases = malloc(sizeof(test_case_exec) * 3);
 
   object_t* obj1 = create_new_int(2);
@@ -83,15 +83,27 @@ test_case_exec* generate_exec_cases(vm_t* vm) {
   reg_t addresses3[2] = {obj5->address, obj6->address};
   command_t* cmd3 = create_command(SUBTRACT, addresses3, 2);
 
+  reg_t addresses4[2] = {obj1->address, obj2->address};
+  command_t* cmd4 = create_command(MULTIPLY, addresses4, 2);
+
+  reg_t addresses5[2] = {obj6->address, obj2->address};
+  command_t* cmd5 = create_command(DIVIDE, addresses5, 2);
+
+
+
   write_cmd_memory(program, cmd1);
   write_cmd_memory(program, cmd2);
   write_cmd_memory(program, cmd3);
+  write_cmd_memory(program, cmd4);
+  write_cmd_memory(program, cmd5);
 
   load_program(vm, program);
 
   test_cases[0] = (test_case_exec){.cmd = cmd1, .desc = "Testing add operation", .output = {.data.v_int = 5, .type = INTEGER}, .vm = vm, .type = INTEGER};
   test_cases[1] = (test_case_exec){.cmd = cmd2, .desc = "Testing string concat", .output = {.data.v_string = "Hello, World", .type = STRING}, .vm = vm, .type = STRING};
   test_cases[2] = (test_case_exec){.cmd = cmd3, .desc = "Testing subtract operation", .output = {.data.v_int = 70, .type = INTEGER}, .vm = vm, .type = INTEGER};
+  test_cases[3] = (test_case_exec){.cmd = cmd4, .desc = "Testing multiply operation", .output = {.data.v_int = 6, .type = INTEGER}, .vm = vm, .type = INTEGER};
+  test_cases[4] = (test_case_exec){.cmd = cmd5, .desc = "Testing divide operation", .output = {.data.v_int = 10, .type = INTEGER}, .vm = vm, .type = INTEGER};
   return test_cases;
 }
 

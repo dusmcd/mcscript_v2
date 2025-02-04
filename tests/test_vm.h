@@ -16,8 +16,8 @@ typedef struct {
 
 
 
-bool test_execute_command(test_case_exec* test_cases, int size);
-test_case_exec* generate_exec_cases(vm_t* vm);
+bool test_arithmetic(test_case_exec* test_cases, int size);
+test_case_exec* generate_arith_cases(vm_t* vm);
 void test_vm();
 
 
