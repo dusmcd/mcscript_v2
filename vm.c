@@ -222,7 +222,7 @@ program_t* create_program(vm_t* vm) {
   if (program == NULL)
     return NULL;
   
-  void** memory = malloc(sizeof(void*) * MAX);
+  void** memory = malloc(sizeof(void*) * (MAX + 1));
   if (memory == NULL) {
     return NULL;
   }

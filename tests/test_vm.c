@@ -67,12 +67,12 @@ test_case_exec* generate_exec_cases(vm_t* vm) {
   object_t* obj6 = create_new_int(30);
 
   program_t* program = create_program(vm);
-  write_obj_memory(program, obj1);
-  write_obj_memory(program, obj2);
-  write_obj_memory(program, obj3);
-  write_obj_memory(program, obj4);
-  write_obj_memory(program, obj5);
-  write_obj_memory(program, obj6);
+  write_obj_memory(program, obj1, 0);
+  write_obj_memory(program, obj2, 0);
+  write_obj_memory(program, obj3, 0);
+  write_obj_memory(program, obj4, 0);
+  write_obj_memory(program, obj5, 0);
+  write_obj_memory(program, obj6, 0);
 
   reg_t addresses1[2] = {obj1->address, obj2->address};
   command_t* cmd1 = create_command(ADD, addresses1, 2);
