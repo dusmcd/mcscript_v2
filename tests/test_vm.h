@@ -1,8 +1,8 @@
 #ifndef _TEST_VM_H
 #define _TEST_VM_H
 
-#include "../vm.h"
-#include "../object.h"
+#include "../src/vm.h"
+#include "../src/object.h"
 #include <stdbool.h>
 
 
