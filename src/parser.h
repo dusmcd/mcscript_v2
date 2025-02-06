@@ -1,0 +1,5 @@
+#ifndef MCSCRIPT_V2_PARSER_H
+#define MCSCRIPT_V2_PARSER_H
+
+
+#endif
