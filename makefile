@@ -22,6 +22,9 @@ parser.o: $(src_path)/parser.c $(src_path)/parser.h
 test_vm.o: $(test_path)/test_vm.c $(test_path)/test_vm.h
 	gcc $< $(flags) -c
 
+test_utils.o: $(test_path)/test_utils.c $(test_path)/test_utils.h
+	gcc $< $(flags) -c
+
 test.o: $(test_path)/test.c
 	gcc $< $(flags) -c
 
@@ -32,7 +35,7 @@ main.o: $(src_path)/main.c
 main: vm.o object.o list.o parser.o str_utils.o main.o
 	gcc $^ -o $(target)
 
-test: test.o test_vm.o vm.o object.o list.o str_utils.o
+test: test.o test_vm.o vm.o object.o list.o str_utils.o test_utils.o
 	gcc $^ -o $(test_target)
 
 clean:

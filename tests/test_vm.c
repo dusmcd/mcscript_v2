@@ -15,8 +15,8 @@ void print_address_space(void** address_space) {
 bool test_arithmetic(test_case_exec* test_cases, int size) {
   for (int i = 0; i < size; i++) {
     test_case_exec t_case = test_cases[i];
-    printf("%s\n", t_case.desc);
-    printf("Expected output: ");
+    printf("\t%s\n", t_case.desc);
+    printf("\tExpected output: ");
     object_t* actual = execute_command(t_case.vm, t_case.cmd);
 
     switch(t_case.type)
@@ -56,7 +56,7 @@ void test_vm() {
   else 
     printf("arithmetic test failed\n");
   
-  printf("\n%i of %i test passed\n", passed, total);
+  printf("%i of %i tests passed\n", passed, total);
 
   free_program(vm->current_program);
   free_vm(vm);

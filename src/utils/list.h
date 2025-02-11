@@ -6,6 +6,7 @@ typedef struct Node node_t;
 struct Node {
   char* val;
   node_t* next;
+  int idx;
 }; 
 
 typedef struct {
@@ -16,6 +17,7 @@ typedef struct {
 
 list_t* initialize_list();
 void push_back(list_t* list, const char* val);
+const char* get_list_item(list_t* list, int idx);
 
 
 #endif
