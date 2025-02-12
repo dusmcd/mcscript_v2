@@ -9,7 +9,7 @@ is to build an intermediary execution environment that can take in pre-defined c
 it's not a virtual machine in the traditional sense. See diagram below.
 
 Once I have a functioning "virtual machine", I will need to figure out how to parse the source code and 
-turn the given statements into commands that the VM can understand (see the `command_t` in *vm.h*).
+turn the given statements into commands that the VM can understand (see the `command_t` struct in *vm.h*).
 
 ## Diagram
 **Source Code** => **Tokens** => **VM Commands** => **Virtual Machine** => **Executable Program**

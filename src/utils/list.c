@@ -44,7 +44,7 @@ void push_back(list_t* list, const char* val) {
   list->size++;
 }
 
-const char* get_list_item(list_t* list, int idx) {
+node_t* get_list_item(list_t* list, int idx) {
   node_t* current = list->head->next;
   for (int i = 0; i < list->size; i++) {
     if (i == idx)

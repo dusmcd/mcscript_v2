@@ -17,7 +17,7 @@ typedef struct {
 
 list_t* initialize_list();
 void push_back(list_t* list, const char* val);
-const char* get_list_item(list_t* list, int idx);
+node_t* get_list_item(list_t* list, int idx);
 
 
 #endif

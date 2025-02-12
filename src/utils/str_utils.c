@@ -23,13 +23,16 @@ list_t* split(const char* str, char ch) {
 
   int j = 0;
   for (int i = 0; i < len; i++) {
-    if (str[i] == ch) {
+    if (str[i] == ch && current != NULL) {
       push_back(substrs, current);
       j = 0;
       free(current);
       current = NULL;
       continue;
     }
+    else if (str[i] == ch && current == NULL)
+      continue;
+
     current = append_str(current, str[i], j + 1);
     j++;
   }

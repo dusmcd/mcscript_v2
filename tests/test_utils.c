@@ -26,7 +26,7 @@ void test_utils() {
   case_split_t* split_cases = generate_cases_split();
   printf("\nTesting utility functions...\n");
 
-  if (test_split(split_cases, 3)) {
+  if (test_split(split_cases, 5)) {
     printf("'test_util' test passed\n");
     passed++;
   }
@@ -58,13 +58,27 @@ case_split_t* generate_cases_split() {
   push_back(list3, "=");
   push_back(list3, "5");
 
-  case_split_t* test_cases = malloc(sizeof(case_split_t) * 3);
+  list_t* list4 = initialize_list();
+  push_back(list4, "here");
+  push_back(list4, "we");
+  push_back(list4, "go");
+
+  list_t* list5 = initialize_list();
+  push_back(list5, "something");
+  push_back(list5, "in");
+  push_back(list5, "the");
+  push_back(list5, "way");
+
+  case_split_t* test_cases = malloc(sizeof(case_split_t) * 5);
   if (test_cases == NULL)
     return NULL;
+
 
   test_cases[0] = (case_split_t){.ch = ' ', .desc = "Testing splitting on whitespace", .output = list1, .input = "The quick brown fox."};
   test_cases[1] = (case_split_t){.ch = ' ', .desc = "Testing splitting on whitespace", .output = list2, .input = "a + b + c"};
   test_cases[2] = (case_split_t){.ch = ' ', .desc = "Testing splitting on whitespace", .output = list3, .input = "var num = 5"};
+  test_cases[3] = (case_split_t){.ch = ' ', .desc = "Testing whitespace at beginning", .output = list4, .input = " here we go"};
+  test_cases[4] = (case_split_t){.ch = ' ', .desc = "Testing multiple whitespaces", .output = list5, .input = "something     in the  way    "};
 
   return test_cases;
 }
